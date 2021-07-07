@@ -1,4 +1,4 @@
-import { Deposit } from '../generated/chainbridge/Bridge'
+import { Deposit } from '../generated/phala-chainbridge/Bridge'
 import { DepositNonce } from '../generated/schema'
 
 export function handleDeposit(event: Deposit): void {

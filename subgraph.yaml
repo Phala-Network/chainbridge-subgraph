@@ -3,7 +3,7 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: chainbridge-bridge
+    name: phala-chainbridge
     network: kovan
     source:
       address: "0xe5F54e020f3E4964Ba11D269Cdda602A78d09917"
