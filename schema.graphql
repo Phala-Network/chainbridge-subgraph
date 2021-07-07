@@ -1,0 +1,6 @@
+type DepositNonce @entity {
+    id: ID!
+    transaction: Bytes!
+    address: Bytes
+    nonce: BigInt
+}

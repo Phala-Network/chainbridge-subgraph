@@ -1,0 +1,24 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: chainbridge-bridge
+    network: kovan
+    source:
+      address: "0xe5F54e020f3E4964Ba11D269Cdda602A78d09917"
+      abi: Bridge
+      startBlock: 25575042
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      abis:
+        - name: Bridge
+          file: ./abis/bridge.json
+      entities:
+        - DepositNonce
+      eventHandlers:
+        - event: "Deposit(indexed uint8,indexed bytes32,indexed uint64)"
+          handler: handleDeposit
+      file: ./src/mapping.ts
