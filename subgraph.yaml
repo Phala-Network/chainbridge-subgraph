@@ -16,9 +16,14 @@ dataSources:
       abis:
         - name: Bridge
           file: ./abis/bridge.json
+        - name: Erc20AssetHandler
+          file: ./abis/erc20assethandler.json
       entities:
-        - DepositNonce
+        - DepositRecord
+        - Proposal
       eventHandlers:
         - event: "Deposit(indexed uint8,indexed bytes32,indexed uint64)"
-          handler: handleDeposit
+          handler: handleDepositEvent
+        - event: "ProposalEvent(indexed uint8,indexed uint64,indexed uint8,bytes32,bytes32)"
+          handler: handleProposalEvent
       file: ./src/mapping.ts

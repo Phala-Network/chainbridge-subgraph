@@ -1,6 +1,29 @@
-type DepositNonce @entity {
+type DepositRecord @entity {
     id: ID!
     transaction: Bytes!
-    address: Bytes
+
+    amount: BigInt
+    depositor: Bytes
+    destinationChainId: Int
+    destinationRecipient: Bytes
     nonce: BigInt
+    resourceId: Bytes
+}
+
+enum ProposalStatus {
+    Inactive
+    Active
+    Passed
+    Executed
+    Cancelled
+}
+
+type Proposal @entity {
+    id: ID!
+
+    depositNonce: BigInt!
+    executedAt: Bytes
+    originChainId: Int!
+    resourceId: Bytes!
+    status: ProposalStatus!
 }
