@@ -1,5 +1,5 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
-import { Deposit, ProposalEvent } from '../generated/phala-chainbridge/Bridge'
+import { BigInt } from '@graphprotocol/graph-ts'
+import { Bridge, Deposit, ProposalEvent } from '../generated/phala-chainbridge/Bridge'
 import { Erc20AssetHandler } from '../generated/phala-chainbridge/Erc20AssetHandler'
 import { DepositRecord, Proposal } from '../generated/schema'
 
@@ -36,8 +36,11 @@ export function handleDepositEvent(event: Deposit): void {
     deposit.transaction = event.transaction.hash
     deposit.save()
 
-    let contract = Erc20AssetHandler.bind(Address.fromString('0xDf2E83f33dB8A9CcF3a00FCe18C3F509b974353D'))
-    let record = contract.getDepositRecord(event.params.depositNonce, event.params.destinationChainID)
+    let bridge = Bridge.bind(event.address)
+    let handlerAddress = bridge._resourceIDToHandlerAddress(event.params.resourceID)
+    let handler = Erc20AssetHandler.bind(handlerAddress)
+
+    let record = handler.getDepositRecord(event.params.depositNonce, event.params.destinationChainID)
     deposit.amount = record._amount
     deposit.depositor = record._depositer
     deposit.destinationRecipient = record._destinationRecipientAddress
