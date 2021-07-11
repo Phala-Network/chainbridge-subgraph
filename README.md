@@ -19,7 +19,7 @@ $ graph deploy --node <GRAPH_NODE_ADMIN_ADDRESS> --ipfs <IPFS_NODE_ADDRESS> chai
 ## Querying
 
 ```graphql
-{
+query {
     depositRecords {
         amount
         depositor
