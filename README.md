@@ -10,10 +10,10 @@ $ yarn
 $ yarn codegen && yarn build
 
 # create this graph on a graph node
-$ graph create --node <GRAPH_NODE_ADMIN_ADDRESS> chainbridge
+$ npx graph create --node <GRAPH_NODE_ADMIN_ADDRESS> chainbridge
 
 # deploy to the node
-$ graph deploy --node <GRAPH_NODE_ADMIN_ADDRESS> --ipfs <IPFS_NODE_ADDRESS> chainbridge
+$ npx graph deploy --node <GRAPH_NODE_ADMIN_ADDRESS> --ipfs <IPFS_NODE_ADDRESS> chainbridge
 ```
 
 ## Querying
