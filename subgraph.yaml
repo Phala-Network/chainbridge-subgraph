@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: phala-chainbridge
-    network: kovan
+    network: mainnet
     source:
-      address: "0xe5F54e020f3E4964Ba11D269Cdda602A78d09917"
       abi: Bridge
-      startBlock: 25575042
+      address: "0xC84456ecA286194A201F844993C220150Cf22C63" # mainnet prod bridge
+      startBlock: 12935211 # deployment height
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
