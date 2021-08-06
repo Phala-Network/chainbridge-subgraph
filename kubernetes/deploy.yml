@@ -1,0 +1,231 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: phala-chainbridge-graph
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graph-node
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    matchLabels:
+      app: graph-node
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: graph-node
+    spec:
+      containers:
+        - name: graph-node
+          image: graphprotocol/graph-node:latest
+          env:
+            - name: ethereum
+              value: "mainnet:endpoint"
+            - name: ipfs
+              value: "ipfs-admin:80"
+            - name: postgres_db
+              value: graph
+            - name: postgres_host
+              value: postgres
+            - name: postgres_pass
+              value: graph
+            - name: postgres_user
+              value: graph
+          resources:
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
+            requests:
+              memory: "0"
+              cpu: "0"
+          ports:
+            - containerPort: 8000
+              name: graphql
+            - containerPort: 8001
+              name: graphql-ws
+            - containerPort: 8020
+              name: jsonrpc
+            - containerPort: 8030
+              name: index-node
+            - containerPort: 8040
+              name: metrics
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graph-node
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    app: graph-node
+  ports:
+    - name: graphql
+      port: 8000
+    - name: graphql-ws
+      port: 8001
+    - name: jsonrpc
+      port: 8020
+    - name: index-node
+      port: 8030
+    - name: metrics
+      port: 8040
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.3-alpine
+          env:
+            - name: POSTGRES_DB
+              value: graph
+            - name: POSTGRES_PASSWORD
+              value: graph
+            - name: POSTGRES_USER
+              value: graph
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+              subPath: postgresql-data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: phala-chainbridge-graph
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: longhorn
+  volumeMode: Filesystem
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipfs
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    matchLabels:
+      app: ipfs
+  template:
+    metadata:
+      labels:
+        app: ipfs
+    spec:
+      containers:
+        - name: ipfs
+          image: ipfs/go-ipfs:latest
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "0"
+              cpu: "0"
+          ports:
+            - containerPort: 4001
+              name: libp2p
+            - containerPort: 4001
+              name: libp2p-udp
+              protocol: UDP
+            - containerPort: 5001
+              name: admin
+            - containerPort: 8080
+              name: gateway
+          volumeMounts:
+            - name: data
+              mountPath: /data/ipfs
+              subPath: ipfs-data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ipfs-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ipfs-data
+  namespace: phala-chainbridge-graph
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: longhorn
+  volumeMode: Filesystem
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-admin
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    app: ipfs
+  ports:
+    - port: 80
+      targetPort: 5001
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-gateway
+  namespace: phala-chainbridge-graph
+spec:
+  selector:
+    app: ipfs
+  ports:
+    - port: 80
+      targetPort: 8080
