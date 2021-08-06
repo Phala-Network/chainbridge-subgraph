@@ -1,4 +1,3 @@
-import { BigInt } from '@graphprotocol/graph-ts'
 import { Bridge, Deposit, ProposalEvent } from '../generated/phala-chainbridge/Bridge'
 import { Erc20AssetHandler } from '../generated/phala-chainbridge/Erc20AssetHandler'
 import { DepositRecord, Proposal } from '../generated/schema'
@@ -37,9 +36,13 @@ export function handleDepositEvent(event: Deposit): void {
     deposit.save()
 
     let bridge = Bridge.bind(event.address)
-    let handlerAddress = bridge._resourceIDToHandlerAddress(event.params.resourceID)
-    let handler = Erc20AssetHandler.bind(handlerAddress)
+    let handlerAddress = bridge.try__resourceIDToHandlerAddress(event.params.resourceID)
 
+    if (handlerAddress.reverted) {
+        return
+    }
+
+    let handler = Erc20AssetHandler.bind(handlerAddress.value)
     let record = handler.getDepositRecord(event.params.depositNonce, event.params.destinationChainID)
     deposit.amount = record._amount
     deposit.depositor = record._depositer
@@ -48,10 +51,8 @@ export function handleDepositEvent(event: Deposit): void {
 }
 
 export function handleProposalEvent(event: ProposalEvent): void {
-    let record = new Proposal(
-        // TODO: i32 to BigInt to string might be the wrong path?
-        BigInt.fromI32(event.params.originChainID).toString() + '-' + event.params.depositNonce.toString()
-    )
+    let originChainId = event.params.originChainID
+    let record = new Proposal(originChainId.toString() + '-' + event.params.depositNonce.toString())
 
     record.depositNonce = event.params.depositNonce
     record.originChainId = event.params.originChainID
