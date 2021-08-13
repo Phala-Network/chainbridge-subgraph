@@ -36,13 +36,9 @@ export function handleDepositEvent(event: Deposit): void {
     deposit.save()
 
     let bridge = Bridge.bind(event.address)
-    let handlerAddress = bridge.try__resourceIDToHandlerAddress(event.params.resourceID)
+    let handlerAddress = bridge._resourceIDToHandlerAddress(event.params.resourceID)
+    let handler = Erc20AssetHandler.bind(handlerAddress)
 
-    if (handlerAddress.reverted) {
-        return
-    }
-
-    let handler = Erc20AssetHandler.bind(handlerAddress.value)
     let record = handler.getDepositRecord(event.params.depositNonce, event.params.destinationChainID)
     deposit.amount = record._amount
     deposit.depositor = record._depositer
