@@ -1,0 +1,62 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  # annotations:
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
+  name: graph-node-ingress
+  namespace: phala-chainbridge-subgraph
+spec:
+  rules:
+    - host: graph-node
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: graph-node
+                port:
+                  number: 8000
+  # tls:
+  #   - hosts:
+  #       - graph-node
+  #     secretName: graph-node-tls
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: graph-node-api-ingress
+  namespace: phala-chainbridge-subgraph
+spec:
+  rules:
+    - host: graph-node-api
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: graph-node
+                port:
+                  number: 8020
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ipfs-admin-ingress
+  namespace: phala-chainbridge-subgraph
+spec:
+  rules:
+    - host: ipfs-admin
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ipfs-admin
+                port:
+                  number: 80
