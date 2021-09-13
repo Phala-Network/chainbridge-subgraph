@@ -1,14 +1,14 @@
 {
     "devDependencies": {
-        "@graphprotocol/graph-cli": "^0.20.1",
+        "@graphprotocol/graph-cli": "^0.21.1",
         "@graphprotocol/graph-ts": "0.20.0",
-        "@typescript-eslint/eslint-plugin": "^4.27.0",
-        "@typescript-eslint/parser": "^4.27.0",
-        "eslint": "^7.29.0",
+        "@typescript-eslint/eslint-plugin": "^4.31.0",
+        "@typescript-eslint/parser": "^4.31.0",
+        "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-import": "^2.23.4",
-        "eslint-plugin-prettier": "^3.4.0",
-        "prettier": "^2.3.1"
+        "eslint-plugin-import": "^2.24.2",
+        "eslint-plugin-prettier": "^4.0.0",
+        "prettier": "^2.4.0"
     },
     "scripts": {
         "codegen": "graph codegen",
