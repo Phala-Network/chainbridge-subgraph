@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    node:
+        image: graphprotocol/graph-node:v0.24.0
+        depends_on:
+            - ipfs
+            - postgres
+        environment:
+            ethereum: 'mainnet:endpoint'
+            ipfs: ipfs:8080
+            postgres_db: graph
+            postgres_host: postgres
+            postgres_pass: graph
+            postgres_user: graph
+        ports:
+            - '8000:8000'
+            - '8020:8020'
+            - '8030:8030'
+    ipfs:
+        image: ipfs/go-ipfs:latest
+        container_name: ipfs
+        ports:
+            - '5001:5001'
+            - '8080:8080'
+    postgres:
+        image: postgres:13-alpine
+        container_name: postgres
+        environment:
+            POSTGRES_DB: graph
+            POSTGRES_PASSWORD: graph
+            POSTGRES_USER: graph
+        volumes:
+            - 'postgres:/var/lib/postgresql/data'
+
+volumes:
+    postgres:

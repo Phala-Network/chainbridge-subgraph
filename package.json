@@ -12,6 +12,8 @@
     },
     "scripts": {
         "codegen": "graph codegen",
-        "build": "graph build"
+        "build": "graph build",
+        "create-local": "graph create -g http://localhost:8020 chainbridge",
+        "deploy-local": "graph deploy -g http://localhost:8020 -i http://localhost:5001 chainbridge"
     }
 }
