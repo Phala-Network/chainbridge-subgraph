@@ -10,20 +10,20 @@ type DepositRecord @entity {
     resourceId: Bytes
 }
 
-enum ProposalStatus {
-    Inactive
-    Active
-    Passed
-    Executed
-    Cancelled
-}
-
-type Proposal @entity {
+type ProposalPassed @entity {
     id: ID!
 
     depositNonce: BigInt!
-    executedAt: Bytes
     originChainId: Int!
     resourceId: Bytes!
-    status: ProposalStatus!
+}
+
+type ProposalExecuted @entity {
+    id: ID!
+
+    depositNonce: BigInt!
+    originChainId: Int!
+    resourceId: Bytes!
+
+    executedAt: Bytes!
 }

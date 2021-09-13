@@ -1,6 +1,6 @@
 import { Bridge, Deposit, ProposalEvent } from '../generated/phala-chainbridge/Bridge'
 import { Erc20AssetHandler } from '../generated/phala-chainbridge/Erc20AssetHandler'
-import { DepositRecord, Proposal } from '../generated/schema'
+import { DepositRecord, ProposalExecuted, ProposalPassed } from '../generated/schema'
 
 enum ProposalStatus {
     Inactive,
@@ -8,23 +8,6 @@ enum ProposalStatus {
     Passed,
     Executed,
     Cancelled,
-}
-
-function getProposalStatusString(status: ProposalStatus): string {
-    switch (status) {
-        case ProposalStatus.Active:
-            return 'Active'
-        case ProposalStatus.Cancelled:
-            return 'Cancelled'
-        case ProposalStatus.Executed:
-            return 'Executed'
-        case ProposalStatus.Inactive:
-            return 'Inactive'
-        case ProposalStatus.Passed:
-            return 'Passed'
-        default:
-            return 'Inactive'
-    }
 }
 
 export function handleDepositEvent(event: Deposit): void {
@@ -47,17 +30,24 @@ export function handleDepositEvent(event: Deposit): void {
 }
 
 export function handleProposalEvent(event: ProposalEvent): void {
+    let depositNonce = event.params.depositNonce
     let originChainId = event.params.originChainID
-    let record = new Proposal(originChainId.toString() + '-' + event.params.depositNonce.toString())
-
-    record.depositNonce = event.params.depositNonce
-    record.originChainId = event.params.originChainID
-    record.resourceId = event.params.resourceID
-    record.status = getProposalStatusString(event.params.status)
+    let resourceId = event.params.resourceID
 
     if (event.params.status === ProposalStatus.Executed) {
+        let record = new ProposalExecuted(originChainId.toString() + '-' + depositNonce.toString())
+        record.depositNonce = depositNonce
         record.executedAt = event.transaction.hash
+        record.originChainId = originChainId
+        record.resourceId = resourceId
+        record.save()
     }
 
-    record.save()
+    if (event.params.status === ProposalStatus.Passed) {
+        let record = new ProposalPassed(originChainId.toString() + '-' + depositNonce.toString())
+        record.depositNonce = depositNonce
+        record.originChainId = originChainId
+        record.resourceId = resourceId
+        record.save()
+    }
 }
